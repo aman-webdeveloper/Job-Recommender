@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "title": "Frontend Developer",
+    "company": "TechSoft",
+    "keywords": ["html", "css", "javascript", "react"],
+    "type": "Full-Time"
+  },
+  {
+    "id": 2,
+    "title": "Backend Developer",
+    "company": "CodeWorks",
+    "keywords": ["node", "express", "mongodb", "api"],
+    "type": "Full-Time"
+  },
+  {
+    "id": 3,
+    "title": "Full Stack Engineer",
+    "company": "DevHub",
+    "keywords": ["javascript", "react", "node", "sql"],
+    "type": "Internship"
+  },
+  {
+    "id": 4,
+    "title": "UI/UX Designer",
+    "company": "Creative Co",
+    "keywords": ["figma", "design", "adobe", "ux"],
+    "type": "Contract"
+  }
+]
