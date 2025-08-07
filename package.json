@@ -23,7 +23,7 @@
     "server": "cd backend && npm run start",
     "dev": "cd frontend && vite",
     "build": "cd frontend && vite build",
-    "preview": "cd frontend && vite preview",
+    "preview": "cd frontend && vite build && vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
