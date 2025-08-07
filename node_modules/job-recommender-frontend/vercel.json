@@ -1,10 +1,14 @@
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "http://job-recommender-backend.onrender.com/api/$1" }
+    {
+      "source": "/api/(.*)",
+      "destination": "https://job-recommender-backend.onrender.com/api/$1"
+    }
   ],
   "build": {
     "env": {
-      "CACHE_BUSTER": "v70"
+      "NODE_VERSION": "18",
+      "CACHE_BUSTER": "v1"
     }
   }
 }
