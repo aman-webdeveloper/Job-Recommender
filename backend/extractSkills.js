@@ -1,140 +1,96 @@
 const fs = require('fs');
 const pdfParse = require('pdf-parse');
 
+// 🛡️ Escape RegExp special characters (e.g., C++, C#, etc.)
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// ✅ Your complete skill mapping
 const skillsMap = {
-  // Web & Software Development
+  "React": ["react", "reactjs"],
+  "Node.js": ["node", "nodejs", "node.js"],
+  "Express.js": ["express", "express.js"],
+  "MongoDB": ["mongodb", "mongo"],
+  "JavaScript": ["javascript", "js"],
   "HTML": ["html"],
   "CSS": ["css"],
-  "JavaScript": ["javascript", "js"],
+  "Python": ["python"],
+  "Java": ["java"],
+  "C++": ["c++"],
+  "C#": ["c#", "c sharp"],
+  "SQL": ["sql", "mysql", "postgresql", "sqlite", "oracle"],
+  "PHP": ["php"],
+  "Laravel": ["laravel"],
+  "Angular": ["angular"],
+  "Vue.js": ["vue", "vuejs", "vue.js"],
   "TypeScript": ["typescript", "ts"],
-  "React": ["react", "reactjs", "react.js"],
-  "Angular": ["angular", "angularjs"],
-  "Vue.js": ["vue", "vue.js"],
-  "Next.js": ["next.js", "nextjs"],
-  "Node.js": ["node", "nodejs", "node.js"],
-  "Express": ["express", "expressjs"],
   "Django": ["django"],
   "Flask": ["flask"],
-  "Spring Boot": ["spring boot", "springboot"],
-  "Laravel": ["laravel"],
-  "PHP": ["php"],
-  "Ruby on Rails": ["ruby on rails", "rails"],
-  "ASP.NET": ["asp.net", "dotnet", "aspnet"],
-  "C": ["c language", "c programming", "language c"],
-  "C++": ["c++", "cpp"],
-  "C#": ["c#"],
-  "Java": ["java", "core java"],
-
-  // Mobile
-  "Java (Android)": ["android development", "android"],
+  "Bootstrap": ["bootstrap"],
+  "Tailwind CSS": ["tailwind", "tailwindcss"],
+  "jQuery": ["jquery"],
+  "Spring Boot": ["spring", "spring boot"],
   "Kotlin": ["kotlin"],
   "Swift": ["swift"],
-  "React Native": ["react native"],
-  "Flutter": ["flutter", "dart"],
-
-  // Stacks
-  "MERN Stack": ["mern"],
-  "MEAN Stack": ["mean"],
-  "LAMP Stack": ["lamp"],
-
-  // Database
-  "MySQL": ["mysql"],
-  "PostgreSQL": ["postgresql", "postgres"],
-  "SQLite": ["sqlite"],
-  "MongoDB": ["mongodb", "mongo"],
-  "Redis": ["redis"],
-  "Oracle": ["oracle", "pl/sql"],
-  "SQL (Data)": ["sql", "structured query language"],
-
-  // Data Science / ML
-  "Python (Data)": ["numpy", "pandas", "matplotlib", "seaborn"],
-  "Machine Learning": ["machine learning", "ml"],
-  "Deep Learning": ["deep learning"],
-  "TensorFlow": ["tensorflow"],
-  "PyTorch": ["pytorch"],
-  "OpenCV": ["opencv"],
-  "NLP": ["natural language processing", "nlp"],
-  "R Programming": ["r programming", "language r"],
-
-  // Cloud & DevOps
+  "Go": ["golang", "go"],
+  "Rust": ["rust"],
+  "Ruby": ["ruby", "rails", "ruby on rails"],
+  "Figma": ["figma"],
+  "Canva": ["canva"],
+  "Adobe Photoshop": ["photoshop"],
+  "Adobe Illustrator": ["illustrator"],
+  "WordPress": ["wordpress"],
+  "Shopify": ["shopify"],
+  "Wix": ["wix"],
+  "Excel": ["excel", "microsoft excel"],
+  "MS Word": ["ms word", "microsoft word"],
+  "PowerPoint": ["powerpoint", "microsoft powerpoint"],
+  "Google Sheets": ["google sheets"],
+  "Data Entry": ["data entry", "typing speed", "form filling", "copy paste"],
+  "Virtual Assistant": ["virtual assistant"],
+  "Customer Support": ["customer support", "customer service"],
+  "Accounting": ["tally", "gst", "accounting", "bookkeeping"],
+  "AutoCAD": ["autocad"],
+  "Photoshop": ["photoshop"],
+  "CorelDRAW": ["coreldraw"],
+  "Digital Marketing": ["digital marketing", "seo", "sem", "google ads", "facebook ads"],
+  "Social Media": ["social media marketing", "smm", "instagram marketing"],
+  "HR": ["hr", "human resource", "recruitment", "payroll"],
+  "Teaching": ["teaching", "lesson planning", "classroom management"],
+  "Content Writing": ["content writing", "blog writing", "copywriting"],
+  "Communication": ["communication", "verbal skills", "email writing"],
+  "Time Management": ["time management"],
+  "Teamwork": ["teamwork", "collaboration"],
+  "Problem Solving": ["problem solving"],
+  "Critical Thinking": ["critical thinking"],
+  "Project Management": ["project management", "scrum", "agile", "jira"],
+  "Linux": ["linux", "ubuntu", "redhat"],
   "AWS": ["aws", "amazon web services"],
-  "Azure": ["azure", "microsoft azure"],
-  "Google Cloud": ["gcp", "google cloud"],
+  "Azure": ["azure"],
+  "GCP": ["google cloud", "gcp"],
+  "Firebase": ["firebase"],
   "Docker": ["docker"],
   "Kubernetes": ["kubernetes", "k8s"],
-  "Jenkins": ["jenkins"],
-  "CI/CD": ["ci/cd", "continuous integration", "continuous deployment"],
-  "Linux": ["linux", "ubuntu", "redhat", "bash", "shell scripting"],
-  "Nginx": ["nginx"],
-  "Apache": ["apache"],
-
-  // Tools & Testing
-  "Git": ["git", "github", "gitlab", "bitbucket"],
-  "VS Code": ["vs code", "visual studio code"],
-  "Eclipse": ["eclipse"],
-  "IntelliJ": ["intellij", "idea"],
-  "Jest": ["jest"],
-  "Mocha": ["mocha"],
-  "Chai": ["chai"],
-  "Cypress": ["cypress"],
-  "Selenium": ["selenium"],
-  "Playwright": ["playwright"],
-
-  // UI/UX & Design
-  "Figma": ["figma"],
-  "Adobe XD": ["adobe xd", "xd"],
-  "Photoshop": ["photoshop"],
-  "Canva": ["canva"],
-
-  // Office Tools (Non-Tech)
-  "MS Excel": ["ms excel", "excel", "microsoft excel"],
-  "MS Word": ["ms word", "word", "microsoft word"],
-  "MS PowerPoint": ["ms powerpoint", "powerpoint"],
-  "Google Sheets": ["google sheets", "gsheet"],
-  "Data Entry": ["data entry", "typing", "data processing"],
-  "Typing": ["typing", "wpm"],
-
-  // CAD & Engineering
-  "AutoCAD": ["autocad"],
-  "Revit": ["revit"],
-  "SketchUp": ["sketchup"],
-
-  // Business & Finance
-  "Tally": ["tally", "tally erp"],
-  "QuickBooks": ["quickbooks"],
-  "Accounting": ["accounting", "bookkeeping"],
-  "Finance": ["finance"],
-  "GST": ["gst", "gst filing"],
-
-  // Management
-  "Project Management": ["project management", "pmp", "scrum", "kanban"],
-  "Agile": ["agile", "scrum", "kanban"],
-  "Leadership": ["leadership", "team lead"],
-  "Teamwork": ["teamwork", "collaboration"],
-
-  // Communication & HR
-  "Communication": ["communication", "verbal skills"],
-  "Customer Support": ["customer support", "csr", "customer service"],
-  "Call Center": ["call center", "bpo"],
-  "HR": ["hr", "human resources", "recruitment"],
-
-  // Marketing & Content
-  "Digital Marketing": ["digital marketing", "seo", "sem", "google ads"],
-  "Sales": ["sales", "telecalling", "sales executive"],
-  "Content Writing": ["content writing", "copywriting", "blogging"],
-  "Technical Writing": ["technical writing"],
-  "Editing": ["editing", "proofreading"],
-
-  // Teaching & Training
-  "Teaching": ["teaching", "tutor", "trainer"],
-  "Curriculum Design": ["curriculum design", "lesson planning"],
-  "Online Teaching Tools": ["zoom", "google classroom", "moodle"],
-
-  // APIs & Data
-  "REST API": ["rest api", "restful"],
+  "Git": ["git", "github", "bitbucket", "version control"],
+  "CI/CD": ["ci", "cd", "jenkins", "github actions"],
+  "Testing": ["jest", "mocha", "cypress", "selenium", "junit"],
+  "UI/UX Design": ["ui design", "ux design", "user interface", "user experience"],
+  "Matplotlib": ["matplotlib"],
+  "Pandas": ["pandas"],
+  "NumPy": ["numpy"],
+  "OpenAI": ["openai", "chatgpt", "gpt-4", "gpt-3"],
+  "Machine Learning": ["machine learning", "scikit", "ml", "tensorflow", "keras"],
+  "Deep Learning": ["deep learning", "cnn", "rnn"],
+  "NLP": ["natural language processing", "nlp"],
+  "Data Analysis": ["data analysis", "data analyst"],
+  "Data Visualization": ["data visualization", "tableau", "power bi"],
+  "REST API": ["rest api", "restful api"],
   "GraphQL": ["graphql"],
-  "JSON": ["json"],
-  "YAML": ["yaml", "yml"]
+  "WebSocket": ["websocket"],
+  "Cybersecurity": ["cybersecurity", "network security", "ethical hacking"],
+  "Blockchain": ["blockchain", "solidity", "web3"],
+  "DevOps": ["devops", "ci/cd", "automation", "infrastructure as code"]
 };
 
 async function extractSkills(filePath) {
@@ -153,7 +109,7 @@ async function extractSkills(filePath) {
 
     for (const [skill, keywords] of Object.entries(skillsMap)) {
       for (const word of keywords) {
-        const regex = new RegExp(`\\b${word}\\b`, 'i');
+        const regex = new RegExp(`\\b${escapeRegex(word)}\\b`, 'i');
         if (regex.test(text)) {
           foundSkills.add(skill);
           break;
