@@ -1,5 +1,5 @@
-require('dotenv').config();
 console.log("🔑 JOOBLE API KEY:", process.env.JOOBLE_API_KEY);
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
