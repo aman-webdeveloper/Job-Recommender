@@ -20,6 +20,14 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
+    "server": "cd backend && npm run start",
+    "dev": "cd frontend && vite",
+    "build": "cd frontend && vite build",
+    "preview": "cd frontend && vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.1",
+    "vite": "^7.1.0"
   }
 }
