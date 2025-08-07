@@ -5,18 +5,14 @@ const axios = require('axios');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const https = require('https'); // 👈 Added for agent handling
 const extractSkills = require('./extractSkills');
-const jobRoutes = require('./routes/jobs');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Multer for file uploads
 const upload = multer({ dest: 'uploads/' });
 
 // Test route
@@ -34,7 +30,7 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
     const filePath = path.join(__dirname, req.file.path);
     console.log('📄 File uploaded at:', filePath);
 
-    // Extract skills
+    // Extract skills from resume
     let skills = [];
     try {
       skills = await extractSkills(filePath);
@@ -44,47 +40,29 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
     }
 
     const keywords = skills.slice(0, 4).join(' ') || 'developer';
+    const encodedKeywords = encodeURIComponent(keywords);
+
+    const adzunaUrl = `https://api.adzuna.com/v1/api/jobs/in/search/1?app_id=${process.env.ADZUNA_APP_ID}&app_key=${process.env.ADZUNA_APP_KEY}&results_per_page=20&what=${encodedKeywords}&content-type=application/json`;
 
     let allJobs = [];
 
     try {
-      // Axios options with fallback agent for dev
-      const axiosOptions = {
-        params: { search: keywords },
-        timeout: 8000,
-        headers: { 'Accept': 'application/json' }
-      };
-
-      if (process.env.NODE_ENV !== 'production') {
-        axiosOptions.httpsAgent = new https.Agent({ rejectUnauthorized: false });
-      }
-
-      const response = await axios.get('https://remotive.io/api/remote-jobs', axiosOptions);
-      allJobs = response.data.jobs || [];
-
-      // Retry if no jobs found
-      if (allJobs.length === 0) {
-        axiosOptions.params.search = 'developer';
-        const retryResponse = await axios.get('https://remotive.io/api/remote-jobs', axiosOptions);
-        allJobs = retryResponse.data.jobs || [];
-      }
-
+      const response = await axios.get(adzunaUrl);
+      allJobs = response.data.results || [];
     } catch (apiErr) {
-      console.error('❌ Remotive API error:', apiErr.message);
-      throw new Error('Failed to fetch jobs from Remotive');
+      console.error('❌ Adzuna API error:', apiErr.message);
+      throw new Error('Failed to fetch jobs from Adzuna');
     }
 
-    // Filter jobs
+    // Filter jobs by skills
     const filteredJobs = allJobs.filter(job =>
       skills.some(skill =>
         job.title?.toLowerCase().includes(skill.toLowerCase()) ||
-        job.description?.toLowerCase().includes(skill.toLowerCase()) ||
-        (Array.isArray(job.tags) &&
-          job.tags.some(tag => tag.toLowerCase().includes(skill.toLowerCase())))
+        job.description?.toLowerCase().includes(skill.toLowerCase())
       )
     );
 
-    // Clean up temp file
+    // Clean up uploaded resume
     fs.unlink(filePath, (err) => {
       if (err) console.warn('⚠️ Could not delete temp file:', err.message);
       else console.log('🧹 Deleted temp resume file');
@@ -100,9 +78,6 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
     res.status(500).json({ error: 'Something went wrong while processing the resume.' });
   }
 });
-
-// Jooble API route
-app.use('/api/jobs', jobRoutes);
 
 // Start server
 app.listen(PORT, () => {

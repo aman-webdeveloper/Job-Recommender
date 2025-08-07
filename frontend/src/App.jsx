@@ -11,7 +11,8 @@ function App() {
   const [selectedSkill, setSelectedSkill] = useState("");
   const [selectedType, setSelectedType] = useState("");
 
-  // 🔄 Apply filters automatically
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
   useEffect(() => {
     applyFilters();
   }, [search, selectedSkill, selectedType, jobs]);
@@ -27,7 +28,7 @@ function App() {
     formData.append("resume", resume);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/upload`, {
+      const res = await fetch(`${API_BASE_URL}/upload`, {
         method: "POST",
         body: formData,
       });
@@ -53,14 +54,12 @@ function App() {
   const applyFilters = () => {
     let filtered = [...jobs];
 
-    // 🔍 Title match
     if (search) {
       filtered = filtered.filter((job) =>
         job.title?.toLowerCase().includes(search.toLowerCase())
       );
     }
 
-    // 🧠 Skill match (check keyword existence)
     if (selectedSkill) {
       filtered = filtered.filter(
         (job) =>
@@ -71,10 +70,9 @@ function App() {
       );
     }
 
-    // 💼 Job type match
     if (selectedType) {
-      filtered = filtered.filter((job) =>
-        job.job_type?.toLowerCase() === selectedType.toLowerCase()
+      filtered = filtered.filter(
+        (job) => job.job_type?.toLowerCase() === selectedType.toLowerCase()
       );
     }
 
@@ -85,7 +83,6 @@ function App() {
     <div className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Job Recommender Tool</h1>
 
-      {/* 📄 Resume Upload */}
       <div className="flex justify-center mb-6">
         <input
           type="file"
@@ -101,7 +98,6 @@ function App() {
         </button>
       </div>
 
-      {/* ✅ Extracted Skills */}
       {skills.length > 0 && (
         <div className="text-center mb-6">
           <p className="text-lg font-semibold">
@@ -110,7 +106,6 @@ function App() {
         </div>
       )}
 
-      {/* 🔎 Filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6 justify-center items-center">
         <input
           type="text"
@@ -146,7 +141,6 @@ function App() {
         </select>
       </div>
 
-      {/* 📋 Job Listings */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {loading ? (
           <p className="text-center col-span-2 text-blue-600">Loading jobs...</p>
@@ -160,9 +154,7 @@ function App() {
             >
               <h2 className="text-xl font-semibold">{job.title}</h2>
               <p className="text-gray-600">{job.company_name}</p>
-              <p className="text-sm text-blue-600 mb-2">
-                {job.job_type || "N/A"}
-              </p>
+              <p className="text-sm text-blue-600 mb-2">{job.job_type || "N/A"}</p>
               <a
                 href={job.url || job.link}
                 target="_blank"
