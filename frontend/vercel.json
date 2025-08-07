@@ -1,5 +1,10 @@
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "http://job-recommender-backend.onrender.com/api/$1" }
-  ]
+  ],
+  "build": {
+    "env": {
+      "CACHE_BUSTER": "v1"
+    }
+  }
 }
