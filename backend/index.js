@@ -18,7 +18,6 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like Postman, curl)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
@@ -32,12 +31,12 @@ app.use(express.json());
 
 const upload = multer({ dest: 'uploads/' });
 
-// ✅ Test Route
+// ✅ Health check route
 app.get('/', (req, res) => {
   res.send('✅ Job Recommender Backend is Live!');
 });
 
-// ✅ Resume Upload Route
+// ✅ Resume Upload + Job Fetch Route
 app.post('/upload', upload.single('resume'), async (req, res) => {
   try {
     if (!req.file) {
@@ -47,7 +46,7 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
     const filePath = path.join(__dirname, req.file.path);
     console.log('📄 File uploaded at:', filePath);
 
-    // Extract skills from resume
+    // 🔍 Extract skills
     let skills = [];
     try {
       skills = await extractSkills(filePath);
@@ -56,6 +55,7 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
       throw new Error('Resume parsing failed: ' + err.message);
     }
 
+    // 🎯 Form job search query
     const keywords = skills.slice(0, 4).join(' ') || 'developer';
     const encodedKeywords = encodeURIComponent(keywords);
 
@@ -71,7 +71,7 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
       throw new Error('Failed to fetch jobs from Adzuna');
     }
 
-    // Filter jobs by skills
+    // 🔍 Filter jobs based on skills
     const filteredJobs = allJobs.filter(job =>
       skills.some(skill =>
         job.title?.toLowerCase().includes(skill.toLowerCase()) ||
@@ -79,12 +79,13 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
       )
     );
 
-    // Clean up resume file
+    // 🧹 Delete uploaded file
     fs.unlink(filePath, (err) => {
       if (err) console.warn('⚠️ Could not delete temp file:', err.message);
       else console.log('🧹 Deleted temp resume file');
     });
 
+    // 📦 Send response
     res.json({
       skills,
       jobs: filteredJobs.length > 0 ? filteredJobs : allJobs.slice(0, 10)
