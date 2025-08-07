@@ -2,8 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const router = express.Router();
 
-const APP_ID = process.env.ADZUNA_APP_ID;
-const APP_KEY = process.env.ADZUNA_APP_KEY;
+const JOOBLE_API_KEY = process.env.JOOBLE_API_KEY;
 
 router.post('/', async (req, res) => {
   const { skills } = req.body;
@@ -13,17 +12,25 @@ router.post('/', async (req, res) => {
   }
 
   const query = skills.join(' ');
-  const country = 'in'; // India
 
-  const url = `https://api.adzuna.com/v1/api/jobs/${country}/search/1?app_id=${APP_ID}&app_key=${APP_KEY}&results_per_page=20&what=${encodeURIComponent(query)}&content-type=application/json`;
+  const url = `https://jooble.org/api/${JOOBLE_API_KEY}`;
+  const body = {
+    keywords: query,
+    location: 'India',
+  };
 
   try {
-    const response = await axios.get(url);
-    const jobs = response.data.results || [];
+    const response = await axios.post(url, body, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const jobs = response.data.jobs || [];
     res.json({ jobs });
   } catch (error) {
-    console.error('❌ Adzuna API error:', error.message);
-    res.status(500).json({ error: 'Failed to fetch jobs from Adzuna' });
+    console.error('❌ Jooble API error:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to fetch jobs from Jooble' });
   }
 });
 
