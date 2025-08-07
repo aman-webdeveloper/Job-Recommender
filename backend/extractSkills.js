@@ -108,7 +108,8 @@ async function extractSkills(filePath) {
       throw new Error("Empty or unreadable PDF content.");
     }
 
-    const text = pdfData.text.toLowerCase();
+    // ✅ Normalize whitespace
+    const text = pdfData.text.toLowerCase().replace(/\s+/g, ' ');
     let foundSkills = [];
 
     for (let [skill, variations] of Object.entries(skillsMap)) {
@@ -117,7 +118,8 @@ async function extractSkills(filePath) {
       }
     }
 
-    foundSkills = [...new Set(foundSkills)];
+    // ✅ Deduplicate and sort
+    foundSkills = [...new Set(foundSkills)].sort();
 
     if (foundSkills.length === 0) {
       console.warn("⚠️ No skills detected — using fallback");

@@ -10,17 +10,34 @@ const extractSkills = require('./extractSkills');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// ✅ Allow Vercel frontend + localhost (for dev testing)
+const allowedOrigins = [
+  'https://job-recommender-two.vercel.app',
+  'http://localhost:3000' // for local testing
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like Postman, curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error(`🚫 CORS: Origin ${origin} not allowed`));
+    }
+  }
+}));
+
 app.use(express.json());
 
 const upload = multer({ dest: 'uploads/' });
 
-// Test route
+// ✅ Test Route
 app.get('/', (req, res) => {
   res.send('✅ Job Recommender Backend is Live!');
 });
 
-// Upload route
+// ✅ Resume Upload Route
 app.post('/upload', upload.single('resume'), async (req, res) => {
   try {
     if (!req.file) {
@@ -62,7 +79,7 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
       )
     );
 
-    // Clean up uploaded resume
+    // Clean up resume file
     fs.unlink(filePath, (err) => {
       if (err) console.warn('⚠️ Could not delete temp file:', err.message);
       else console.log('🧹 Deleted temp resume file');
@@ -79,7 +96,7 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
   }
 });
 
-// Start server
+// ✅ Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
