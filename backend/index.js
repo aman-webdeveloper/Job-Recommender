@@ -10,7 +10,7 @@ const extractSkills = require('./extractSkills');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Allow frontend origins
+// ✅ CORS setup for Vercel and local frontend
 const allowedOrigins = [
   'https://job-recommender-two.vercel.app',
   'http://localhost:3000'
@@ -24,7 +24,8 @@ app.use(cors({
     } else {
       return callback(new Error(`🚫 CORS: Origin ${origin} not allowed`));
     }
-  }
+  },
+  credentials: true
 }));
 
 app.use(express.json());
@@ -46,7 +47,7 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
     const filePath = path.join(__dirname, req.file.path);
     console.log('📄 File uploaded at:', filePath);
 
-    // 🔍 Extract skills
+    // 🔍 Extract skills from resume
     let skills = [];
     try {
       skills = await extractSkills(filePath);
@@ -82,12 +83,14 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
 
     res.json({
       skills,
-      jobs: jobResults.slice(0, 10) // show top 10 jobs
+      jobs: jobResults.slice(0, 10)
     });
 
   } catch (err) {
     console.error('🔥 Upload route crashed:', err.message);
-    res.status(500).json({ error: 'Something went wrong while processing the resume or fetching jobs.' });
+    res.status(500).json({
+      error: 'Something went wrong while processing the resume or fetching jobs.'
+    });
   }
 });
 
