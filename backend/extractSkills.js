@@ -6,7 +6,6 @@ function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// ✅ Your complete skill mapping
 const skillsMap = {
   "React": ["react", "reactjs"],
   "Node.js": ["node", "nodejs", "node.js"],
@@ -17,7 +16,7 @@ const skillsMap = {
   "CSS": ["css"],
   "Python": ["python"],
   "Java": ["java"],
-  "C++": ["c++"],
+  "C++": ["c++", "cpp"],
   "C#": ["c#", "c sharp"],
   "SQL": ["sql", "mysql", "postgresql", "sqlite", "oracle"],
   "PHP": ["php"],
@@ -52,7 +51,6 @@ const skillsMap = {
   "Customer Support": ["customer support", "customer service"],
   "Accounting": ["tally", "gst", "accounting", "bookkeeping"],
   "AutoCAD": ["autocad"],
-  "Photoshop": ["photoshop"],
   "CorelDRAW": ["coreldraw"],
   "Digital Marketing": ["digital marketing", "seo", "sem", "google ads", "facebook ads"],
   "Social Media": ["social media marketing", "smm", "instagram marketing"],
@@ -95,7 +93,7 @@ const skillsMap = {
 
 async function extractSkills(filePath) {
   try {
-    console.log("📥 Reading file:", filePath);
+    console.log("\ud83d\udce5 Reading file:", filePath);
 
     const pdfBuffer = fs.readFileSync(filePath);
     const pdfData = await pdfParse(pdfBuffer);
@@ -120,15 +118,15 @@ async function extractSkills(filePath) {
     const finalSkills = [...foundSkills].sort();
 
     if (finalSkills.length === 0) {
-      console.warn("⚠️ No skills found. Returning fallback.");
+      console.warn("\u26a0\ufe0f No skills found. Returning fallback.");
       return ["React", "Node.js"];
     }
 
-    console.log("✅ Extracted skills:", finalSkills);
+    console.log("\u2705 Extracted skills:", finalSkills);
     return finalSkills;
 
   } catch (err) {
-    console.error("❌ Error during skill extraction:", err.message);
+    console.error("\u274c Error during skill extraction:", err.message);
     return ["React", "Node.js"];
   }
 }
