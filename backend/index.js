@@ -10,10 +10,10 @@ const extractSkills = require('./extractSkills');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Allow Vercel frontend + localhost (for dev testing)
+// ✅ Allow frontend origins
 const allowedOrigins = [
   'https://job-recommender-two.vercel.app',
-  'http://localhost:3000' // for local testing
+  'http://localhost:3000'
 ];
 
 app.use(cors({
@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
   res.send('✅ Job Recommender Backend is Live!');
 });
 
-// ✅ Resume Upload + Job Fetch Route
+// ✅ Resume Upload + Jooble Job Fetch
 app.post('/upload', upload.single('resume'), async (req, res) => {
   try {
     if (!req.file) {
@@ -55,45 +55,39 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
       throw new Error('Resume parsing failed: ' + err.message);
     }
 
-    // 🎯 Form job search query
-    const keywords = skills.slice(0, 4).join(' ') || 'developer';
-    const encodedKeywords = encodeURIComponent(keywords);
+    const keywords = skills.slice(0, 5).join(' ') || 'developer';
 
-    const adzunaUrl = `https://api.adzuna.com/v1/api/jobs/in/search/1?app_id=${process.env.ADZUNA_APP_ID}&app_key=${process.env.ADZUNA_APP_KEY}&results_per_page=20&what=${encodedKeywords}&content-type=application/json`;
-
-    let allJobs = [];
-
-    try {
-      const response = await axios.get(adzunaUrl);
-      allJobs = response.data.results || [];
-    } catch (apiErr) {
-      console.error('❌ Adzuna API error:', apiErr.message);
-      throw new Error('Failed to fetch jobs from Adzuna');
-    }
-
-    // 🔍 Filter jobs based on skills
-    const filteredJobs = allJobs.filter(job =>
-      skills.some(skill =>
-        job.title?.toLowerCase().includes(skill.toLowerCase()) ||
-        job.description?.toLowerCase().includes(skill.toLowerCase())
-      )
+    // 🔗 Jooble API call
+    const joobleUrl = 'https://jooble.org/api/';
+    const response = await axios.post(
+      `${joobleUrl}${process.env.JOOBLE_API_KEY}`,
+      {
+        keywords: keywords,
+        location: 'India'
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
     );
 
-    // 🧹 Delete uploaded file
+    const jobResults = response.data.jobs || [];
+
+    // 🧹 Clean up uploaded file
     fs.unlink(filePath, (err) => {
       if (err) console.warn('⚠️ Could not delete temp file:', err.message);
       else console.log('🧹 Deleted temp resume file');
     });
 
-    // 📦 Send response
     res.json({
       skills,
-      jobs: filteredJobs.length > 0 ? filteredJobs : allJobs.slice(0, 10)
+      jobs: jobResults.slice(0, 10) // show top 10 jobs
     });
 
   } catch (err) {
     console.error('🔥 Upload route crashed:', err.message);
-    res.status(500).json({ error: 'Something went wrong while processing the resume.' });
+    res.status(500).json({ error: 'Something went wrong while processing the resume or fetching jobs.' });
   }
 });
 

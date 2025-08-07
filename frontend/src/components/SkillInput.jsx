@@ -10,13 +10,12 @@ const SkillInput = () => {
   const handleSubmit = async () => {
     console.log("Skills entered:", skills);
 
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
     try {
-      const response = await axios.post(
-        "https://job-recommender-qtmp.onrender.com/api/jobs",
-        {
-          keywords: skills.split(",").map((s) => s.trim()),
-        }
-      );
+      const response = await axios.post(`${API_BASE_URL}/api/jobs`, {
+        keywords: skills.split(",").map((s) => s.trim()),
+      });
 
       console.log("Jobs fetched:", response.data.jobs);
       setJobs(response.data.jobs);

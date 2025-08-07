@@ -1,9 +1,8 @@
 const fs = require('fs');
 const pdfParse = require('pdf-parse');
 
-// ✅ Comprehensive skills map covering frontend, backend, devops, cloud, data, etc.
 const skillsMap = {
-  // Frontend
+  // --- [Same full map as you already have] ---
   "HTML": ["html"],
   "CSS": ["css"],
   "JavaScript": ["javascript", "js"],
@@ -17,7 +16,6 @@ const skillsMap = {
   "Bootstrap": ["bootstrap"],
   "jQuery": ["jquery"],
 
-  // Backend
   "Node.js": ["node", "nodejs", "node.js"],
   "Express": ["express", "expressjs"],
   "Django": ["django"],
@@ -28,19 +26,16 @@ const skillsMap = {
   "Ruby on Rails": ["ruby on rails", "rails"],
   "ASP.NET": ["asp.net", "dotnet", "aspnet"],
 
-  // Full Stack
   "MERN Stack": ["mern"],
   "MEAN Stack": ["mean"],
   "LAMP Stack": ["lamp"],
 
-  // Mobile Development
   "React Native": ["react native"],
   "Flutter": ["flutter"],
   "Kotlin": ["kotlin"],
   "Swift": ["swift"],
   "Java (Android)": ["android development"],
 
-  // Databases
   "MongoDB": ["mongodb", "mongo"],
   "MySQL": ["mysql"],
   "PostgreSQL": ["postgresql", "postgres"],
@@ -48,7 +43,6 @@ const skillsMap = {
   "Redis": ["redis"],
   "Oracle": ["oracle database"],
 
-  // DevOps & Cloud
   "AWS": ["aws", "amazon web services"],
   "Azure": ["azure", "microsoft azure"],
   "Google Cloud": ["gcp", "google cloud"],
@@ -61,7 +55,6 @@ const skillsMap = {
   "Nginx": ["nginx"],
   "Apache": ["apache"],
 
-  // Data Analysis & Excel
   "Excel": ["excel", "microsoft excel", "spreadsheets"],
   "Power BI": ["powerbi", "power bi"],
   "Tableau": ["tableau"],
@@ -69,7 +62,6 @@ const skillsMap = {
   "SQL (Data)": ["sql", "mysql", "postgresql", "sqlite"],
   "R Programming": ["r programming", "language r"],
 
-  // AI & ML
   "Machine Learning": ["machine learning", "ml"],
   "Deep Learning": ["deep learning"],
   "TensorFlow": ["tensorflow"],
@@ -77,7 +69,6 @@ const skillsMap = {
   "OpenCV": ["opencv"],
   "NLP": ["natural language processing", "nlp"],
 
-  // Testing
   "Jest": ["jest"],
   "Mocha": ["mocha"],
   "Chai": ["chai"],
@@ -85,7 +76,6 @@ const skillsMap = {
   "Selenium": ["selenium"],
   "Playwright": ["playwright"],
 
-  // Tools & Others
   "Figma": ["figma"],
   "Adobe XD": ["adobe xd", "xd"],
   "Photoshop": ["photoshop"],
@@ -104,33 +94,36 @@ async function extractSkills(filePath) {
     const pdfBuffer = fs.readFileSync(filePath);
     const pdfData = await pdfParse(pdfBuffer);
 
-    if (!pdfData || !pdfData.text) {
-      throw new Error("Empty or unreadable PDF content.");
+    if (!pdfData?.text) {
+      throw new Error("PDF content unreadable or empty.");
     }
 
-    // ✅ Normalize whitespace
-    const text = pdfData.text.toLowerCase().replace(/\s+/g, ' ');
-    let foundSkills = [];
+    const text = pdfData.text.toLowerCase();
+    const foundSkills = new Set();
 
-    for (let [skill, variations] of Object.entries(skillsMap)) {
-      if (variations.some(v => text.includes(v))) {
-        foundSkills.push(skill);
+    for (const [skill, keywords] of Object.entries(skillsMap)) {
+      for (const word of keywords) {
+        const regex = new RegExp(`\\b${word}\\b`, 'i');
+        if (regex.test(text)) {
+          foundSkills.add(skill);
+          break;
+        }
       }
     }
 
-    // ✅ Deduplicate and sort
-    foundSkills = [...new Set(foundSkills)].sort();
+    const finalSkills = [...foundSkills].sort();
 
-    if (foundSkills.length === 0) {
-      console.warn("⚠️ No skills detected — using fallback");
+    if (finalSkills.length === 0) {
+      console.warn("⚠️ No skills found. Returning fallback.");
       return ["React", "Node.js"];
     }
 
-    return foundSkills;
+    console.log("✅ Extracted skills:", finalSkills);
+    return finalSkills;
 
-  } catch (error) {
-    console.error("❌ Error extracting skills from resume:", error.message);
-    return ["React", "Node.js"]; // fallback
+  } catch (err) {
+    console.error("❌ Error during skill extraction:", err.message);
+    return ["React", "Node.js"];
   }
 }
 
