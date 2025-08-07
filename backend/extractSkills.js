@@ -2,20 +2,15 @@ const fs = require('fs');
 const pdfParse = require('pdf-parse');
 
 const skillsMap = {
-  // --- [Same full map as you already have] ---
+  // Web & Software Development
   "HTML": ["html"],
   "CSS": ["css"],
   "JavaScript": ["javascript", "js"],
   "TypeScript": ["typescript", "ts"],
   "React": ["react", "reactjs", "react.js"],
-  "Next.js": ["next.js", "nextjs"],
-  "Vue.js": ["vue", "vuejs", "vue.js"],
   "Angular": ["angular", "angularjs"],
-  "SASS/SCSS": ["sass", "scss"],
-  "Tailwind CSS": ["tailwind", "tailwindcss"],
-  "Bootstrap": ["bootstrap"],
-  "jQuery": ["jquery"],
-
+  "Vue.js": ["vue", "vue.js"],
+  "Next.js": ["next.js", "nextjs"],
   "Node.js": ["node", "nodejs", "node.js"],
   "Express": ["express", "expressjs"],
   "Django": ["django"],
@@ -25,24 +20,43 @@ const skillsMap = {
   "PHP": ["php"],
   "Ruby on Rails": ["ruby on rails", "rails"],
   "ASP.NET": ["asp.net", "dotnet", "aspnet"],
+  "C": ["c language", "c programming", "language c"],
+  "C++": ["c++", "cpp"],
+  "C#": ["c#"],
+  "Java": ["java", "core java"],
 
+  // Mobile
+  "Java (Android)": ["android development", "android"],
+  "Kotlin": ["kotlin"],
+  "Swift": ["swift"],
+  "React Native": ["react native"],
+  "Flutter": ["flutter", "dart"],
+
+  // Stacks
   "MERN Stack": ["mern"],
   "MEAN Stack": ["mean"],
   "LAMP Stack": ["lamp"],
 
-  "React Native": ["react native"],
-  "Flutter": ["flutter"],
-  "Kotlin": ["kotlin"],
-  "Swift": ["swift"],
-  "Java (Android)": ["android development"],
-
-  "MongoDB": ["mongodb", "mongo"],
+  // Database
   "MySQL": ["mysql"],
   "PostgreSQL": ["postgresql", "postgres"],
   "SQLite": ["sqlite"],
+  "MongoDB": ["mongodb", "mongo"],
   "Redis": ["redis"],
-  "Oracle": ["oracle database"],
+  "Oracle": ["oracle", "pl/sql"],
+  "SQL (Data)": ["sql", "structured query language"],
 
+  // Data Science / ML
+  "Python (Data)": ["numpy", "pandas", "matplotlib", "seaborn"],
+  "Machine Learning": ["machine learning", "ml"],
+  "Deep Learning": ["deep learning"],
+  "TensorFlow": ["tensorflow"],
+  "PyTorch": ["pytorch"],
+  "OpenCV": ["opencv"],
+  "NLP": ["natural language processing", "nlp"],
+  "R Programming": ["r programming", "language r"],
+
+  // Cloud & DevOps
   "AWS": ["aws", "amazon web services"],
   "Azure": ["azure", "microsoft azure"],
   "Google Cloud": ["gcp", "google cloud"],
@@ -50,25 +64,15 @@ const skillsMap = {
   "Kubernetes": ["kubernetes", "k8s"],
   "Jenkins": ["jenkins"],
   "CI/CD": ["ci/cd", "continuous integration", "continuous deployment"],
-  "Git": ["git", "github", "gitlab", "bitbucket"],
-  "Linux": ["linux", "bash", "shell scripting"],
+  "Linux": ["linux", "ubuntu", "redhat", "bash", "shell scripting"],
   "Nginx": ["nginx"],
   "Apache": ["apache"],
 
-  "Excel": ["excel", "microsoft excel", "spreadsheets"],
-  "Power BI": ["powerbi", "power bi"],
-  "Tableau": ["tableau"],
-  "Python (Data)": ["numpy", "pandas", "matplotlib", "seaborn"],
-  "SQL (Data)": ["sql", "mysql", "postgresql", "sqlite"],
-  "R Programming": ["r programming", "language r"],
-
-  "Machine Learning": ["machine learning", "ml"],
-  "Deep Learning": ["deep learning"],
-  "TensorFlow": ["tensorflow"],
-  "PyTorch": ["pytorch"],
-  "OpenCV": ["opencv"],
-  "NLP": ["natural language processing", "nlp"],
-
+  // Tools & Testing
+  "Git": ["git", "github", "gitlab", "bitbucket"],
+  "VS Code": ["vs code", "visual studio code"],
+  "Eclipse": ["eclipse"],
+  "IntelliJ": ["intellij", "idea"],
   "Jest": ["jest"],
   "Mocha": ["mocha"],
   "Chai": ["chai"],
@@ -76,11 +80,57 @@ const skillsMap = {
   "Selenium": ["selenium"],
   "Playwright": ["playwright"],
 
+  // UI/UX & Design
   "Figma": ["figma"],
   "Adobe XD": ["adobe xd", "xd"],
   "Photoshop": ["photoshop"],
-  "VS Code": ["vs code", "visual studio code"],
+  "Canva": ["canva"],
+
+  // Office Tools (Non-Tech)
+  "MS Excel": ["ms excel", "excel", "microsoft excel"],
+  "MS Word": ["ms word", "word", "microsoft word"],
+  "MS PowerPoint": ["ms powerpoint", "powerpoint"],
+  "Google Sheets": ["google sheets", "gsheet"],
+  "Data Entry": ["data entry", "typing", "data processing"],
+  "Typing": ["typing", "wpm"],
+
+  // CAD & Engineering
+  "AutoCAD": ["autocad"],
+  "Revit": ["revit"],
+  "SketchUp": ["sketchup"],
+
+  // Business & Finance
+  "Tally": ["tally", "tally erp"],
+  "QuickBooks": ["quickbooks"],
+  "Accounting": ["accounting", "bookkeeping"],
+  "Finance": ["finance"],
+  "GST": ["gst", "gst filing"],
+
+  // Management
+  "Project Management": ["project management", "pmp", "scrum", "kanban"],
   "Agile": ["agile", "scrum", "kanban"],
+  "Leadership": ["leadership", "team lead"],
+  "Teamwork": ["teamwork", "collaboration"],
+
+  // Communication & HR
+  "Communication": ["communication", "verbal skills"],
+  "Customer Support": ["customer support", "csr", "customer service"],
+  "Call Center": ["call center", "bpo"],
+  "HR": ["hr", "human resources", "recruitment"],
+
+  // Marketing & Content
+  "Digital Marketing": ["digital marketing", "seo", "sem", "google ads"],
+  "Sales": ["sales", "telecalling", "sales executive"],
+  "Content Writing": ["content writing", "copywriting", "blogging"],
+  "Technical Writing": ["technical writing"],
+  "Editing": ["editing", "proofreading"],
+
+  // Teaching & Training
+  "Teaching": ["teaching", "tutor", "trainer"],
+  "Curriculum Design": ["curriculum design", "lesson planning"],
+  "Online Teaching Tools": ["zoom", "google classroom", "moodle"],
+
+  // APIs & Data
   "REST API": ["rest api", "restful"],
   "GraphQL": ["graphql"],
   "JSON": ["json"],
