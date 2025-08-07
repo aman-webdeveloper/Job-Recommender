@@ -33,19 +33,22 @@ function App() {
         body: formData,
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get("content-type");
 
       if (!res.ok) {
-        alert(`Backend Error: ${data.error || "Unknown error"}`);
-        return;
+        const errorText = contentType && contentType.includes("application/json")
+          ? (await res.json()).error
+          : await res.text();
+        throw new Error(errorText || "Unknown server error");
       }
 
+      const data = await res.json();
       setSkills(data.skills || []);
       setJobs(data.jobs || []);
       setFilteredJobs(data.jobs || []);
     } catch (err) {
-      console.error("❌ Upload failed:", err);
-      alert("Resume upload failed. See console for details.");
+      console.error("❌ Upload failed:", err.message);
+      alert("Upload failed: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -101,7 +104,8 @@ function App() {
       {skills.length > 0 && (
         <div className="text-center mb-6">
           <p className="text-lg font-semibold">
-            Skills Found: <span className="text-blue-600">{skills.join(", ")}</span>
+            Skills Found:{" "}
+            <span className="text-blue-600">{skills.join(", ")}</span>
           </p>
         </div>
       )}
@@ -154,7 +158,9 @@ function App() {
             >
               <h2 className="text-xl font-semibold">{job.title}</h2>
               <p className="text-gray-600">{job.company_name}</p>
-              <p className="text-sm text-blue-600 mb-2">{job.job_type || "N/A"}</p>
+              <p className="text-sm text-blue-600 mb-2">
+                {job.job_type || "N/A"}
+              </p>
               <a
                 href={job.url || job.link}
                 target="_blank"
