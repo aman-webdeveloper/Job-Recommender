@@ -52,36 +52,40 @@ app.post("/upload", upload.single("resume"), async (req, res) => {
     let skills = [];
     try {
       skills = await extractSkills(filePath);
-      console.log("✅ Skills:", skills);
+      console.info(`${skills.length} skills extracted`);
     } catch (err) {
-      throw new Error("Resume parsing failed: " + err.message);
+      console.error("Resume parsing failed: " + err.message);
     }
 
-    const keywords = skills.slice(0, 5).join(" ") || "developer";
+    let jobs = null;
+    let response = null;
+    if(skills.length){
+      const keywords = skills.slice(0, 5).join(" ") || "developer";
 
-    // Jooble API call
-    const joobleUrl = "https://jooble.org/api/";
-    const response = await axios.post(
-      `${joobleUrl}${process.env.JOOBLE_API_KEY}`,
-      {
-        keywords,
-        location: "India",
-      },
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+      // Jooble API call
+      const joobleUrl = "https://jooble.org/api/";
+      response = await axios.post(
+        `${joobleUrl}${process.env.JOOBLE_API_KEY}`,
+        {
+          keywords,
+          location: "India",
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
-    const jobs = response.data.jobs || [];
+    }
+    jobs = response?.data?.jobs || [];
     // Delete temp file
     fs.unlink(filePath, (err) => {
       if (err) console.warn("⚠️ Failed to delete file:", err.message);
-      else console.log("🧹 File deleted");
+      else console.info("🧹 File deleted");
     });
 
     res.json({
       skills,
-      jobs: jobs.slice(0, 10),
+      jobs: jobs.slice(0, 10) || [],
     });
   } catch (err) {
     console.error("🔥 Error:", err.message);
