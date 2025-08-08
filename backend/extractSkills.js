@@ -119,7 +119,7 @@ async function extractSkills(filePath) {
 
     if (finalSkills.length === 0) {
       console.warn("\u26a0\ufe0f No skills found. Returning fallback.");
-      return ["React", "Node.js"];
+      return [];
     }
 
     console.log("\u2705 Extracted skills:", finalSkills);
@@ -127,7 +127,7 @@ async function extractSkills(filePath) {
 
   } catch (err) {
     console.error("\u274c Error during skill extraction:", err.message);
-    return ["React", "Node.js"];
+    return [];
   }
 }
 
