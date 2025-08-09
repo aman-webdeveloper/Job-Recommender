@@ -10,6 +10,7 @@ function App() {
   const [search, setSearch] = useState("");
   const [selectedSkill, setSelectedSkill] = useState("");
   const [selectedType, setSelectedType] = useState("");
+  const [newUpload, setNewUpload] = useState(true);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -46,6 +47,7 @@ function App() {
       setSkills(data.skills || []);
       setJobs(data.jobs || []);
       setFilteredJobs(data.jobs || []);
+      setNewUpload(false);
     } catch (err) {
       console.error("❌ Upload failed:", err.message);
       alert("Upload failed: " + err.message);
@@ -101,14 +103,17 @@ function App() {
         </button>
       </div>
 
-      {skills.length > 0 && (
+      {
         <div className="text-center mb-6">
           <p className="text-lg font-semibold">
-            Skills Found:{" "}
+            {
+              newUpload ? "" : `${skills.length} Skills Found:`
+            }
+            <br />
             <span className="text-blue-600">{skills.join(", ")}</span>
           </p>
         </div>
-      )}
+      }
 
       <div className="flex flex-col md:flex-row gap-4 mb-6 justify-center items-center">
         <input
@@ -173,7 +178,7 @@ function App() {
           ))
         )}
       </div>
-    </div>
+    </div >
   );
 }
 
